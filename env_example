@@ -1,0 +1,32 @@
+# Database - Separate databases for each service
+CUSTOMER_DB_URI=mongodb://localhost:27017/customer-service
+PRODUCTS_DB_URI=mongodb://localhost:27017/products-service
+SHOPPING_DB_URI=mongodb://localhost:27017/shopping-service
+AUTH_DB_URI=mongodb://localhost:27017/auth-service
+
+# JWT
+JWT_SECRET=your-super-secret-jwt-key-change-in-production
+JWT_EXPIRATION=3600
+
+# Microservices Ports
+GATEWAY_PORT=3000
+CUSTOMER_PORT=3001
+PRODUCTS_PORT=3002
+SHOPPING_PORT=3003
+AUTH_PORT=3004
+
+# AWS Configuration
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your-aws-access-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret-key
+AWS_S3_BUCKET=your-s3-bucket-name
+AWS_SNS_TOPIC_ARN=your-sns-topic-arn
+AWS_SES_FROM_EMAIL=noreply@yourdomain.com
+
+# Redis (for caching and sessions)
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+
+# Environment
+NODE_ENV=development

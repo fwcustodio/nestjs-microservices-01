@@ -1,0 +1,179 @@
+version: '3.8'
+services:
+  # MongoDB Services
+  mongodb-customer:
+    image: mongo:7.0
+    container_name: mongodb-customer
+    restart: always
+    ports:
+      - '27018:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: customer-service
+    volumes:
+      - customer_data:/data/db
+    networks:
+      - microservices-network
+
+  mongodb-products:
+    image: mongo:7.0
+    container_name: mongodb-products
+    restart: always
+    ports:
+      - '27019:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: products-service
+    volumes:
+      - products_data:/data/db
+    networks:
+      - microservices-network
+
+  mongodb-shopping:
+    image: mongo:7.0
+    container_name: mongodb-shopping
+    restart: always
+    ports:
+      - '27020:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: shopping-service
+    volumes:
+      - shopping_data:/data/db
+    networks:
+      - microservices-network
+
+  mongodb-auth:
+    image: mongo:7.0
+    container_name: mongodb-auth
+    restart: always
+    ports:
+      - '27021:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: auth-service
+    volumes:
+      - auth_data:/data/db
+    networks:
+      - microservices-network
+
+  # Redis for caching and sessions
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - microservices-network
+
+  # Microservices
+  auth-service:
+    build:
+      context: .
+      dockerfile: apps/auth/Dockerfile
+    container_name: auth-service
+    restart: always
+    ports:
+      - '3004:3004'
+    environment:
+      - AUTH_DB_URI=mongodb://admin:password@mongodb-auth:27017/auth-service?authSource=admin
+      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+      - JWT_EXPIRATION=3600
+      - AUTH_PORT=3004
+      - NODE_ENV=production
+    depends_on:
+      - mongodb-auth
+    networks:
+      - microservices-network
+
+  customer-service:
+    build:
+      context: .
+      dockerfile: apps/customer/Dockerfile
+    container_name: customer-service
+    restart: always
+    ports:
+      - '3001:3001'
+    environment:
+      - CUSTOMER_DB_URI=mongodb://admin:password@mongodb-customer:27017/customer-service?authSource=admin
+      - CUSTOMER_PORT=3001
+      - NODE_ENV=production
+    depends_on:
+      - mongodb-customer
+    networks:
+      - microservices-network
+
+  products-service:
+    build:
+      context: .
+      dockerfile: apps/products/Dockerfile
+    container_name: products-service
+    restart: always
+    ports:
+      - '3002:3002'
+    environment:
+      - PRODUCTS_DB_URI=mongodb://admin:password@mongodb-products:27017/products-service?authSource=admin
+      - PRODUCTS_PORT=3002
+      - NODE_ENV=production
+    depends_on:
+      - mongodb-products
+    networks:
+      - microservices-network
+
+  shopping-service:
+    build:
+      context: .
+      dockerfile: apps/shopping/Dockerfile
+    container_name: shopping-service
+    restart: always
+    ports:
+      - '3003:3003'
+    environment:
+      - SHOPPING_DB_URI=mongodb://admin:password@mongodb-shopping:27017/shopping-service?authSource=admin
+      - SHOPPING_PORT=3003
+      - NODE_ENV=production
+    depends_on:
+      - mongodb-shopping
+    networks:
+      - microservices-network
+
+  gateway:
+    build:
+      context: .
+      dockerfile: apps/gateway/Dockerfile
+    container_name: api-gateway
+    restart: always
+    ports:
+      - '3000:3000'
+    environment:
+      - GATEWAY_PORT=3000
+      - CUSTOMER_PORT=3001
+      - PRODUCTS_PORT=3002
+      - SHOPPING_PORT=3003
+      - AUTH_PORT=3004
+      - NODE_ENV=production
+    depends_on:
+      - auth-service
+      - customer-service
+      - products-service
+      - shopping-service
+    networks:
+      - microservices-network
+
+volumes:
+  customer_data:
+  products_data:
+  shopping_data:
+  auth_data:
+  redis_data:
+
+networks:
+  microservices-network:
+    driver: bridge
