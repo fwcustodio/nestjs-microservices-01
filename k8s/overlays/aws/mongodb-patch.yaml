@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb-auth
+spec:
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb-auth-storage
+    spec:
+      storageClassName: gp3-mongodb
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb-customer
+spec:
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb-customer-storage
+    spec:
+      storageClassName: gp3-mongodb
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb-products
+spec:
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb-products-storage
+    spec:
+      storageClassName: gp3-mongodb
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 20Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb-shopping
+spec:
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb-shopping-storage
+    spec:
+      storageClassName: gp3-mongodb
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 15Gi

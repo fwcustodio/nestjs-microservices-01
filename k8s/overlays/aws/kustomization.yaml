@@ -1,0 +1,51 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: ecommerce-microservices
+
+resources:
+- ../../base/namespace.yaml
+- ../../base/config.yaml
+- ../../base/mongodb.yaml
+- ../../base/redis.yaml
+- ../../base/auth-service.yaml
+- ../../base/customer-service.yaml
+- ../../base/products-service.yaml
+- ../../base/shopping-service.yaml
+- ../../base/gateway.yaml
+- ../../base/ingress.yaml
+- ../../base/hpa.yaml
+- storage-class.yaml
+
+patchesStrategicMerge:
+- gateway-patch.yaml
+- mongodb-patch.yaml
+
+images:
+- name: nestjs-ecommerce/gateway
+  newName: 123456789012.dkr.ecr.us-east-1.amazonaws.com/nestjs-ecommerce/gateway
+  newTag: latest
+- name: nestjs-ecommerce/auth-service
+  newName: 123456789012.dkr.ecr.us-east-1.amazonaws.com/nestjs-ecommerce/auth-service
+  newTag: latest
+- name: nestjs-ecommerce/customer-service
+  newName: 123456789012.dkr.ecr.us-east-1.amazonaws.com/nestjs-ecommerce/customer-service
+  newTag: latest
+- name: nestjs-ecommerce/products-service
+  newName: 123456789012.dkr.ecr.us-east-1.amazonaws.com/nestjs-ecommerce/products-service
+  newTag: latest
+- name: nestjs-ecommerce/shopping-service
+  newName: 123456789012.dkr.ecr.us-east-1.amazonaws.com/nestjs-ecommerce/shopping-service
+  newTag: latest
+
+configMapGenerator:
+- name: aws-config
+  literals:
+  - AWS_REGION=us-east-1
+  - EKS_CLUSTER_NAME=ecommerce-cluster
+
+secretGenerator:
+- name: aws-secrets
+  literals:
+  - AWS_ACCESS_KEY_ID=CHANGE_ME
+  - AWS_SECRET_ACCESS_KEY=CHANGE_ME

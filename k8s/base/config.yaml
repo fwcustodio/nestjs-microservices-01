@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: ecommerce-microservices
+data:
+  # Database URIs
+  AUTH_DB_URI: "mongodb://admin:password@mongodb-auth:27017/auth-service?authSource=admin"
+  CUSTOMER_DB_URI: "mongodb://admin:password@mongodb-customer:27017/customer-service?authSource=admin"
+  PRODUCTS_DB_URI: "mongodb://admin:password@mongodb-products:27017/products-service?authSource=admin"
+  SHOPPING_DB_URI: "mongodb://admin:password@mongodb-shopping:27017/shopping-service?authSource=admin"
+  
+  # JWT Configuration
+  JWT_EXPIRATION: "3600"
+  
+  # Service Ports
+  GATEWAY_PORT: "3000"
+  CUSTOMER_PORT: "3001"
+  PRODUCTS_PORT: "3002"
+  SHOPPING_PORT: "3003"
+  AUTH_PORT: "3004"
+  
+  # Redis Configuration
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+  REDIS_DB: "0"
+  
+  # AWS Configuration
+  AWS_REGION: "us-east-1"
+  AWS_S3_BUCKET: "ecommerce-products-images"
+  AWS_SNS_TOPIC_ARN: "arn:aws:sns:us-east-1:123456789012:ecommerce-notifications"
+  AWS_SES_FROM_EMAIL: "noreply@your-domain.com"
+  
+  # Application Settings
+  NODE_ENV: "production"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secrets
+  namespace: ecommerce-microservices
+type: Opaque
+data:
+  # Base64 encoded secrets
+  JWT_SECRET: eW91ci1zdXBlci1zZWNyZXQtand0LWtleS1jaGFuZ2UtaW4tcHJvZHVjdGlvbg== # your-super-secret-jwt-key-change-in-production
+  AWS_ACCESS_KEY_ID: ""  # Add your base64 encoded AWS access key
+  AWS_SECRET_ACCESS_KEY: ""  # Add your base64 encoded AWS secret key
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-secret
+  namespace: ecommerce-microservices
+type: Opaque
+data:
+  password: cGFzc3dvcmQ=  # password

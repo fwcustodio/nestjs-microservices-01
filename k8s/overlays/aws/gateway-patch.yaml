@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+spec:
+  template:
+    spec:
+      serviceAccountName: ecommerce-service-account
+      containers:
+      - name: gateway
+        env:
+        - name: AWS_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: aws-config
+              key: AWS_REGION
+        - name: EKS_CLUSTER_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: aws-config
+              key: EKS_CLUSTER_NAME
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ecommerce-service-account
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/EKSServiceRole
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+spec:
+  type: LoadBalancer
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"

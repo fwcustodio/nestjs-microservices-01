@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shopping-service
+  namespace: ecommerce-microservices
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: shopping-service
+  template:
+    metadata:
+      labels:
+        app: shopping-service
+    spec:
+      containers:
+      - name: shopping-service
+        image: nestjs-ecommerce/shopping-service:latest
+        ports:
+        - containerPort: 3003
+        env:
+        - name: SHOPPING_DB_URI
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: SHOPPING_DB_URI
+        - name: SHOPPING_PORT
+          value: "3003"
+        - name: NODE_ENV
+          value: "production"
+        - name: AWS_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: AWS_REGION
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: AWS_SECRET_ACCESS_KEY
+        - name: AWS_SNS_TOPIC_ARN
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: AWS_SNS_TOPIC_ARN
+        - name: AWS_SES_FROM_EMAIL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: AWS_SES_FROM_EMAIL
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3003
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3003
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      initContainers:
+      - name: wait-for-mongodb
+        image: busybox:1.35
+        command: ['sh', '-c', 'until nc -z mongodb-shopping 27017; do echo waiting for mongodb-shopping; sleep 2; done;']
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shopping-service
+  namespace: ecommerce-microservices
+spec:
+  selector:
+    app: shopping-service
+  ports:
+  - port: 3003
+    targetPort: 3003
+  type: ClusterIP

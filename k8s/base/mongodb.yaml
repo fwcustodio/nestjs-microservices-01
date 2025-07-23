@@ -1,0 +1,251 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb-auth
+  namespace: ecommerce-microservices
+spec:
+  serviceName: mongodb-auth
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb-auth
+  template:
+    metadata:
+      labels:
+        app: mongodb-auth
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:7.0
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: "admin"
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: password
+        - name: MONGO_INITDB_DATABASE
+          value: "auth-service"
+        volumeMounts:
+        - name: mongodb-auth-storage
+          mountPath: /data/db
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb-auth-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-auth
+  namespace: ecommerce-microservices
+spec:
+  selector:
+    app: mongodb-auth
+  ports:
+  - port: 27017
+    targetPort: 27017
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb-customer
+  namespace: ecommerce-microservices
+spec:
+  serviceName: mongodb-customer
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb-customer
+  template:
+    metadata:
+      labels:
+        app: mongodb-customer
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:7.0
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: "admin"
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: password
+        - name: MONGO_INITDB_DATABASE
+          value: "customer-service"
+        volumeMounts:
+        - name: mongodb-customer-storage
+          mountPath: /data/db
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb-customer-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-customer
+  namespace: ecommerce-microservices
+spec:
+  selector:
+    app: mongodb-customer
+  ports:
+  - port: 27017
+    targetPort: 27017
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb-products
+  namespace: ecommerce-microservices
+spec:
+  serviceName: mongodb-products
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb-products
+  template:
+    metadata:
+      labels:
+        app: mongodb-products
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:7.0
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: "admin"
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: password
+        - name: MONGO_INITDB_DATABASE
+          value: "products-service"
+        volumeMounts:
+        - name: mongodb-products-storage
+          mountPath: /data/db
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb-products-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-products
+  namespace: ecommerce-microservices
+spec:
+  selector:
+    app: mongodb-products
+  ports:
+  - port: 27017
+    targetPort: 27017
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb-shopping
+  namespace: ecommerce-microservices
+spec:
+  serviceName: mongodb-shopping
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb-shopping
+  template:
+    metadata:
+      labels:
+        app: mongodb-shopping
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:7.0
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: "admin"
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: password
+        - name: MONGO_INITDB_DATABASE
+          value: "shopping-service"
+        volumeMounts:
+        - name: mongodb-shopping-storage
+          mountPath: /data/db
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb-shopping-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-shopping
+  namespace: ecommerce-microservices
+spec:
+  selector:
+    app: mongodb-shopping
+  ports:
+  - port: 27017
+    targetPort: 27017
+  clusterIP: None
