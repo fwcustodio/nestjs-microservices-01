@@ -5,6 +5,7 @@ A scalable e-commerce platform built with NestJS microservices architecture, Mon
 ## Architecture
 
 The platform consists of 5 main services:
+
 - **API Gateway** (Port 3000) - Routes requests to microservices
 - **Auth Service** (Port 3004) - User authentication and authorization
 - **Customer Service** (Port 3001) - Customer management
@@ -25,22 +26,25 @@ Each service has its own MongoDB database for complete data isolation.
 ### Development Mode
 
 1. Install dependencies:
+
 ```bash
 npm install
 ```
 
 2. Copy and configure environment variables:
+
 ```bash
 cp .env.example .env
 # Edit .env with your configuration
 ```
 
 3. Start MongoDB instances (if not using Docker):
+
 ```bash
 # Customer service database
 mongod --port 27018 --dbpath ./data/customer
 
-# Products service database  
+# Products service database
 mongod --port 27019 --dbpath ./data/products
 
 # Shopping service database
@@ -51,6 +55,7 @@ mongod --port 27021 --dbpath ./data/auth
 ```
 
 4. Start all services:
+
 ```bash
 # Build the project
 npm run build
@@ -66,11 +71,13 @@ npm run start:gateway
 ### Using Docker Compose
 
 1. Build and start all services:
+
 ```bash
 docker-compose up --build
 ```
 
 2. Stop all services:
+
 ```bash
 docker-compose down
 ```
@@ -78,6 +85,7 @@ docker-compose down
 ## API Endpoints
 
 ### Authentication (`/auth`)
+
 - `POST /auth/register` - Register new user
 - `POST /auth/login` - User login
 - `GET /auth/profile` - Get user profile (authenticated)
@@ -86,6 +94,7 @@ docker-compose down
 - `POST /auth/logout` - Logout user (authenticated)
 
 ### Customers (`/customers`)
+
 - `POST /customers` - Create customer (authenticated)
 - `GET /customers` - Get all customers (authenticated)
 - `GET /customers/:id` - Get customer by ID (authenticated)
@@ -94,6 +103,7 @@ docker-compose down
 - `DELETE /customers/:id` - Delete customer (authenticated)
 
 ### Products (`/products`)
+
 - `POST /products` - Create product (authenticated)
 - `GET /products` - Get all products (public)
 - `GET /products/search?q=term` - Search products (public)
@@ -104,6 +114,7 @@ docker-compose down
 - `DELETE /products/:id` - Delete product (authenticated)
 
 ### Shopping (`/shopping`)
+
 - `POST /shopping/cart` - Add item to cart (authenticated)
 - `GET /shopping/cart/:customerId` - Get customer's cart (authenticated)
 - `PATCH /shopping/cart` - Update cart item quantity (authenticated)
@@ -118,6 +129,7 @@ docker-compose down
 ## Environment Variables
 
 ### Database Configuration
+
 ```env
 CUSTOMER_DB_URI=mongodb://localhost:27017/customer-service
 PRODUCTS_DB_URI=mongodb://localhost:27017/products-service
@@ -126,12 +138,14 @@ AUTH_DB_URI=mongodb://localhost:27017/auth-service
 ```
 
 ### JWT Configuration
+
 ```env
 JWT_SECRET=your-super-secret-jwt-key-change-in-production
 JWT_EXPIRATION=3600
 ```
 
 ### Service Ports
+
 ```env
 GATEWAY_PORT=3000
 CUSTOMER_PORT=3001
@@ -141,6 +155,7 @@ AUTH_PORT=3004
 ```
 
 ### AWS Configuration (Optional)
+
 ```env
 AWS_REGION=us-east-1
 AWS_ACCESS_KEY_ID=your-aws-access-key
@@ -153,6 +168,7 @@ AWS_SES_FROM_EMAIL=noreply@yourdomain.com
 ## AWS Services Integration
 
 The platform includes AWS service integration for:
+
 - **S3**: File storage for product images
 - **SNS**: Push notifications for order updates
 - **SES**: Email notifications for users
@@ -199,25 +215,30 @@ nest-microservices-ecommerce/
 ## Data Models
 
 ### User (Auth Service)
+
 - firstName, lastName, email, password
 - role (customer, admin, vendor)
 - isActive, emailVerified
 - phone, lastLogin
 
 ### Customer (Customer Service)
+
 - firstName, lastName, email, phone
 - address (street, city, state, zipCode, country)
 
 ### Product (Products Service)
+
 - name, description, price, category
 - stock, images, specifications
 - isActive, rating, reviewCount
 
 ### Cart (Shopping Service)
+
 - customerId, items[]
 - items: { productId, quantity }
 
 ### Order (Shopping Service)
+
 - customerId, items[], total, status
 - shippingAddress, payment
 - status: pending, confirmed, processing, shipped, delivered, cancelled
